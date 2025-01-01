@@ -188,3 +188,91 @@ export const logout = (req, res) => {
     return res.json({ message: "Unable to logout." });
   }
 };
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log(email);
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.render("forgot-password", {
+        error: "User not found",
+        message: null,
+      });
+    }
+
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    await user.save();
+
+    await transporter.sendMail({
+      to: user.email,
+      subject: "Password Reset OTP",
+      html: `
+        <h1>Password Reset</h1>
+        <p>Your OTP for password reset is: <strong>${otp}</strong></p>
+        <p>This OTP will expire in 5 minutes.</p>
+      `,
+    });
+
+    res.render("reset-password", {
+      email: user.email,
+      error: null,
+      message: "OTP sent to your email",
+    });
+  } catch (error) {
+    res.render("forgot-password", {
+      error: "Error processing request. Please try again.",
+      message: null,
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword, confirmPassword } = req.body;
+    console.log(email, otp, newPassword, confirmPassword);
+    if (newPassword !== confirmPassword) {
+      return res.render("reset-password", {
+        email,
+        error: "Passwords do not match",
+        message: null,
+      });
+    }
+
+    const user = await User.findOne({
+      email,
+      otp: otp,
+      otpExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.render("reset-password", {
+        email,
+        error: "Invalid or expired OTP",
+        message: null,
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    res.render("login", {
+      error: null,
+      message:
+        "Password reset successful. You can now log in with your new password.",
+    });
+  } catch (error) {
+    res.render("reset-password", {
+      email: req.body.email,
+      error: "Error resetting password. Please try again.",
+      message: null,
+    });
+  }
+};
