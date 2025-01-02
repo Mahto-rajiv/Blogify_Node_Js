@@ -5,6 +5,8 @@ import staticRouter from "./routes/staticRoutes.js";
 import authRoutes from "./routes/user.js";
 import { checkTokenAuthentication } from "./middlewares/auth.js";
 import cookieParser from "cookie-parser";
+import { deleteUnverifiedUsers } from "./jobs/deleteUnverifiedUsers.js";
+import blogRoutes from "./routes/blog.js";
 
 dotenv.config();
 
@@ -30,6 +32,10 @@ app.set("views", "./views");
 //Todo - Routes
 app.use("/", staticRouter);
 app.use("/api/auth", authRoutes);
+app.use("/api/blog", blogRoutes);
+
+//Todo- Schedule job to delete unverified users
+setInterval(deleteUnverifiedUsers, 5 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log("Server is listening on port :", PORT);

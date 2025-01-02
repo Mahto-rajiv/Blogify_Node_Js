@@ -25,3 +25,10 @@ export const checkTokenAuthentication = (cookieName) => {
     }
   };
 };
+
+export const isAuthenticated = (req, res, next) => {
+  if (req.user) {
+    return next();
+  }
+  res.redirect("/login");
+};

@@ -1,21 +1,41 @@
-import { Router } from "express";
+import express from "express";
+import { isAuthenticated } from "../middlewares/auth.js";
+import Blog from "../models/blog.model.js";
 
-const staticRouter = Router();
+const router = express.Router();
 
-staticRouter.get("/", (req, res) => {
-  return res.render("home", { user: req.user });
+router.get("/", async (req, res) => {
+  try {
+    const blogs = await Blog.find({}).populate("author", "fullName");
+    return res.render("home", { allBlogs: blogs, user: req.user });
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    return res.render("home", {
+      allBlogs: [],
+      user: req.user,
+      error: "Failed to fetch blogs",
+    });
+  }
 });
 
-staticRouter.get("/login", (req, res) => {
-  return res.render("login");
+router.get("/login", (req, res) => {
+  res.render("login", { error: null, message: null });
 });
 
-staticRouter.get("/signup", (req, res) => {
-  return res.render("signup");
+router.get("/signup", (req, res) => {
+  res.render("signup", { error: null });
 });
 
-staticRouter.get("/forgot-password", (req, res) => {
-  return res.render("forgot-password");
+router.get("/forgot-password", (req, res) => {
+  res.render("forgot-password", { error: null, message: null });
 });
 
-export default staticRouter;
+router.get("/reset-password", (req, res) => {
+  res.render("reset-password", { email: "", error: null, message: null });
+});
+
+router.get("/add-blog", isAuthenticated, (req, res) => {
+  res.render("add-blog", { user: req.user });
+});
+
+export default router;

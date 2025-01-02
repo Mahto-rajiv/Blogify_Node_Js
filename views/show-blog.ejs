@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') %>
+        <title>Blogify - <%= blogDetails.title %>
+        </title>
+</head>
+
+<body>
+    <%- include('./partials/nav') %>
+
+        <div class="container mt-5">
+            <div class="blog-post">
+                <% if (blogDetails.image) { %>
+                    <img src="<%= blogDetails.image %>" class="blog-header-image" alt="<%= blogDetails.title %>">
+                    <% } %>
+
+                        <h1 class="blog-title mb-3">
+                            <%= blogDetails.title %>
+                        </h1>
+
+                        <div class="blog-meta mb-4">
+                            <span class="text-muted">By <%= blogDetails.author.fullName %></span>
+                            <span class="text-muted mx-2">•</span>
+                            <span class="text-muted">
+                                <%= new Date(blogDetails.createdAt).toLocaleDateString() %>
+                            </span>
+                        </div>
+
+                        <div class="blog-content mb-5">
+                            <%= blogDetails.body%>
+                        </div>
+
+                        <hr class="my-5">
+
+                        <!-- Comments Section -->
+                        <div class="comments-section">
+                            <h3 class="mb-4">Comments</h3>
+
+                            <% if (locals.user) { %>
+                                <!-- Comment Form -->
+                                <form class="comment-form mb-4" action="#" method="POST">
+                                    <div class="mb-3">
+                                        <textarea class="form-control" name="comment" rows="3"
+                                            placeholder="Write your comment here..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                                </form>
+                                <% } else { %>
+                                    <div class="alert alert-info">
+                                        Please <a href="/login" class="alert-link">login</a> to leave a comment.
+                                    </div>
+                                    <% } %>
+
+                                        <!-- Sample Comments (to be replaced with actual comments) -->
+                                        <div class="comments-list">
+                                            <div class="comment">
+                                                <div class="comment-header">
+                                                    <strong>Sample User</strong>
+                                                    <span class="text-muted ms-2">2 days ago</span>
+                                                </div>
+                                                <div class="comment-body mt-2">
+                                                    This is a sample comment. The actual commenting functionality will
+                                                    be implemented later.
+                                                </div>
+                                            </div>
+                                        </div>
+                        </div>
+            </div>
+        </div>
+
+        <%- include('./partials/script') %>
+</body>
+
+</html>
