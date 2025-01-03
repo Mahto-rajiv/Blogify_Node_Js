@@ -35,3 +35,34 @@ export const getBlogById = async (req, res) => {
     res.status(500).json({ error: "Error fetching blog post" });
   }
 };
+
+export const showCurrentLoggedUserAllBlogs = async (req, res) => {
+  try {
+    const allBlogs = await Blog.find({ author: req.user._id });
+    return res.render("usersBlogs", { allBlogs: allBlogs, user: req.user });
+  } catch (error) {
+    console.log("Error showing current user blogs.");
+  }
+};
+
+export const deleteLoggedUserBlog = async (req, res) => {
+  try {
+    const blog = await Blog.findOneAndDelete({
+      _id: req.params.id,
+      author: req.user._id,
+    });
+
+    if (!blog) {
+      return res
+        .status(404)
+        .json({ message: "Blog not found or not authorized to delete." });
+    }
+
+    return res.status(200).json({ message: "Blog deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting blog:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong.", error: error.message });
+  }
+};
