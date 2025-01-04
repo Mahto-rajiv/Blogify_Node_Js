@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') %>
+        <title>Edit Blog - Blogify</title>
+</head>
+
+<body class="bg-light">
+    <%- include('./partials/nav') %>
+
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h2 class="card-title text-center mb-4">Edit Blog</h2>
+                            <% if (locals.error) { %>
+                                <div class="alert alert-danger" role="alert">
+                                    <%= error %>
+                                </div>
+                                <% } %>
+                                    <form id="updateBlogForm" onsubmit="handleUpdate(event)">
+                                        <div class="mb-3">
+                                            <label for="title" class="form-label">Title</label>
+                                            <input type="text" class="form-control" id="title" name="title"
+                                                value="<%= blog.title %>" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="body" class="form-label">Body</label>
+                                            <textarea class="form-control" id="body" name="body" rows="5"
+                                                required><%= blog.body %></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="image" class="form-label">Image</label>
+                                            <% if (blog.image) { %>
+                                                <div class="mb-2">
+                                                    <img src="<%= blog.image %>" alt="Current blog image"
+                                                        style="max-width: 200px;" class="img-thumbnail">
+                                                </div>
+                                                <% } %>
+                                                    <input type="file" class="form-control" id="image" name="image"
+                                                        accept="image/*">
+                                                    <small class="text-muted">Leave empty to keep current image</small>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">Update Blog</button>
+                                        <a href="/api/blog/yourAllBlogs" class="btn btn-secondary w-100 mt-2">Cancel</a>
+                                    </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            async function handleUpdate(event) {
+                event.preventDefault();
+
+                const form = event.target;
+                const formData = new FormData(form);
+                const blogId = '<%= blog._id %>';
+
+                try {
+                    const response = await fetch(`/api/blog/update/${blogId}`, {
+                        method: 'PUT',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        alert('Blog updated successfully!');
+                        window.location.href = '/api/blog/yourAllBlogs'; // Redirect to home page
+                    } else {
+                        const data = await response.json();
+                        alert(`Error: ${data.message || 'Failed to update blog'}`);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An unexpected error occurred');
+                }
+            }
+        </script>
+
+        <%- include('./partials/script') %>
+</body>
+
+</html>

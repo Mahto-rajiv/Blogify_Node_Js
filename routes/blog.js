@@ -4,6 +4,8 @@ import {
   getBlogById,
   showCurrentLoggedUserAllBlogs,
   deleteLoggedUserBlog,
+  getEditBlogPage,
+  updateBlogById,
 } from "../controllers/blog.js";
 import { isAuthenticated } from "../middlewares/auth.js";
 import upload from "../middlewares/upload.js";
@@ -14,5 +16,12 @@ router.post("/create", isAuthenticated, upload.single("image"), createBlog);
 router.get("/blogId/:id", getBlogById);
 router.get("/yourAllBlogs", isAuthenticated, showCurrentLoggedUserAllBlogs);
 router.delete("/delete/:id", isAuthenticated, deleteLoggedUserBlog);
+router.get("/edit/:id", isAuthenticated, getEditBlogPage);
+router.put(
+  "/update/:id",
+  isAuthenticated,
+  upload.single("image"),
+  updateBlogById
+);
 
 export default router;

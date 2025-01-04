@@ -66,3 +66,58 @@ export const deleteLoggedUserBlog = async (req, res) => {
       .json({ message: "Something went wrong.", error: error.message });
   }
 };
+
+export const getEditBlogPage = async (req, res) => {
+  try {
+    const blog = await Blog.findOne({
+      _id: req.params.id,
+      author: req.user._id,
+    });
+
+    if (!blog) {
+      return res.redirect("/?error=Blog not found or not authorized");
+    }
+
+    return res.render("edit-blog", { blog, user: req.user });
+  } catch (error) {
+    console.error("Error fetching blog for edit:", error);
+    res.redirect("/?error=Error fetching blog");
+  }
+};
+
+export const updateBlogById = async (req, res) => {
+  try {
+    const { title, body } = req.body;
+    const updateData = { title, body };
+
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    }
+
+    const blog = await Blog.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        author: req.user._id,
+      },
+      updateData,
+      { new: true }
+    );
+
+    if (!blog) {
+      return res
+        .status(404)
+        .json({ message: "Blog not found or not authorized" });
+    }
+
+    return res.status(200).json({
+      message: "Blog updated successfully",
+      blog: blog,
+    });
+  } catch (error) {
+    console.error("Error updating blog:", error);
+    return res.status(500).json({
+      message: "Something went wrong while updating the blog",
+      error: error.message,
+    });
+  }
+};

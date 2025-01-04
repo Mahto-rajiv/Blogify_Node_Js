@@ -7,6 +7,8 @@ import { checkTokenAuthentication } from "./middlewares/auth.js";
 import cookieParser from "cookie-parser";
 import { deleteUnverifiedUsers } from "./jobs/deleteUnverifiedUsers.js";
 import blogRoutes from "./routes/blog.js";
+import morgan from "morgan";
+import commentRoute from "./routes/comment.route.js";
 
 dotenv.config();
 
@@ -24,6 +26,7 @@ app.use(express.static("./public"));
 app.use(urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(morgan("dev"));
 app.use(checkTokenAuthentication("token"));
 
 app.set("view engine", "ejs");
@@ -33,6 +36,7 @@ app.set("views", "./views");
 app.use("/", staticRouter);
 app.use("/api/auth", authRoutes);
 app.use("/api/blog", blogRoutes);
+app.use("/", commentRoute);
 
 //Todo- Schedule job to delete unverified users
 setInterval(deleteUnverifiedUsers, 5 * 60 * 1000);
