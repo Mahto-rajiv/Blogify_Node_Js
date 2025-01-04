@@ -30,11 +30,9 @@ export const createComment = async (req, res) => {
 export const getCommentsByBlogId = async (req, res) => {
   try {
     const blogId = req.params.blogId;
-    console.log(req.user);
     const comments = await Comment.find({ blog: blogId })
       .populate("author", "fullName")
       .sort({ createdAt: -1 });
-    console.log(comments);
     res.json(comments);
   } catch (error) {
     console.error("Error fetching comments:", error);

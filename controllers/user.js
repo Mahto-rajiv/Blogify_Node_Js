@@ -192,7 +192,6 @@ export const logout = (req, res) => {
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log(email);
     const user = await User.findOne({ email });
     if (!user) {
       return res.render("forgot-password", {
@@ -234,7 +233,6 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword, confirmPassword } = req.body;
-    console.log(email, otp, newPassword, confirmPassword);
     if (newPassword !== confirmPassword) {
       return res.render("reset-password", {
         email,

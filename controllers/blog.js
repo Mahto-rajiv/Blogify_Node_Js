@@ -38,7 +38,10 @@ export const getBlogById = async (req, res) => {
 
 export const showCurrentLoggedUserAllBlogs = async (req, res) => {
   try {
-    const allBlogs = await Blog.find({ author: req.user._id });
+    console.log("Hello");
+    const allBlogs = await Blog.find({ author: req.user._id }).populate(
+      "author"
+    );
     return res.render("usersBlogs", { allBlogs: allBlogs, user: req.user });
   } catch (error) {
     console.log("Error showing current user blogs.");
