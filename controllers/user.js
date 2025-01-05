@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import mailService from "../utils/mailer.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/auth.js";
+import Blog from "../models/blog.model.js";
 
 const { transporter, verifyTransporter } = mailService;
 verifyTransporter();
@@ -272,5 +273,20 @@ export const resetPassword = async (req, res) => {
       error: "Error resetting password. Please try again.",
       message: null,
     });
+  }
+};
+
+export const userProfilePage = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const posts = await Blog.find({ author: req.user._id });
+    const postsCount = posts.length || 0;
+    return res.render("user-profile", {
+      userDetails: user,
+      user: req.user,
+      posts: postsCount,
+    });
+  } catch (error) {
+    console.log("Error userProfilePage");
   }
 };

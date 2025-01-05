@@ -28,9 +28,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    profileImage: {
+      type: String,
+      default: "/images/default.avif",
+    },
     otp: String,
     otpExpires: Date,
   },
+
   { timestamps: true }
 );
 
